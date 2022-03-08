@@ -9,9 +9,28 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mvvmtodo.data.Task
 import com.example.mvvmtodo.databinding.ItemTaskBinding
 
-class TaskAdapter(): ListAdapter<Task,TaskAdapter.TasksViewHolder>(DiffCallback()) {
+class TaskAdapter(private val listener: OnItemClickListener): ListAdapter<Task,TaskAdapter.TasksViewHolder>(DiffCallback()) {
 
-    class TasksViewHolder(private val binding:ItemTaskBinding):RecyclerView.ViewHolder(binding.root){
+    inner class TasksViewHolder(private val binding:ItemTaskBinding):RecyclerView.ViewHolder(binding.root){
+
+        init {
+            binding.apply {
+                root.setOnClickListener {
+                    val position = adapterPosition
+                    if (position != RecyclerView.NO_POSITION){
+                        val task = getItem(position)
+                        listener.onItemClick(task)
+                    }
+                }
+                checkBoxCompleted.setOnClickListener {
+                    val position = adapterPosition
+                    if (position != RecyclerView.NO_POSITION){
+                        val task = getItem(position)
+                        listener.onCheckBoxClick(task, checkBoxCompleted.isChecked)
+                    }
+                }
+            }
+        }
 
         fun bind(task:Task){
             binding.apply {
@@ -43,5 +62,10 @@ class TaskAdapter(): ListAdapter<Task,TaskAdapter.TasksViewHolder>(DiffCallback(
            oldItem == newItem
 
 
+    }
+
+    interface OnItemClickListener{
+        fun onItemClick(task:Task)
+        fun onCheckBoxClick(task:Task,isChecked:Boolean)
     }
 }
