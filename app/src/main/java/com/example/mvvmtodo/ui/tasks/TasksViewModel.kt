@@ -3,6 +3,8 @@ package com.example.mvvmtodo.ui.tasks
 import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.example.mvvmtodo.ADD_TASK_RESULT_OK
+import com.example.mvvmtodo.EDIT_TASK_RESULT_OK
 import com.example.mvvmtodo.data.PreferencesManager
 import com.example.mvvmtodo.data.SortOrder
 import com.example.mvvmtodo.data.Task
@@ -71,10 +73,27 @@ class TasksViewModel @ViewModelInject constructor(
         taskDao.update(task.copy(completed = isChecked))
     }
 
+    fun onAddEditResult(result: Int) {
+        when (result) {
+            ADD_TASK_RESULT_OK -> showConfirmationMessage("Task Added")
+            EDIT_TASK_RESULT_OK -> showConfirmationMessage("Task updated")
+        }
+    }
+
+    private fun showConfirmationMessage(msg: String)= viewModelScope.launch {
+        taskEventChannel.send(TaskEvents.ShowTaskSavedConfirmationMessage(msg))
+    }
+
+    fun deleteAllCompletedClick() =viewModelScope.launch {
+        taskEventChannel.send(TaskEvents.NavigateToDeleteAllCompletedScreen)
+    }
+
     sealed class TaskEvents(){
         data class ShowUndoDeleteTaskMessage(val task: Task):TaskEvents()
         data class NavigateToEditTask(val task: Task):TaskEvents()
         object NavigateToAddTask:TaskEvents()
+        data class ShowTaskSavedConfirmationMessage(val msg:String):TaskEvents()
+        object NavigateToDeleteAllCompletedScreen : TaskEvents()
     }
 
 }

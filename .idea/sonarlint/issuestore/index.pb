@@ -9,5 +9,5 @@ P
  app/src/main/AndroidManifest.xml,8\c\8c55c3ccc257e5907959013f99656e4c8ec3903e
 @
 app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
-f
-6app/src/main/java/com/example/mvvmtodo/data/TaskDao.kt,e\8\e88807ce1adb8c41e5c6bf0038563852ed559036
+n
+>app/src/main/java/com/example/mvvmtodo/ui/tasks/TaskAdapter.kt,7\c\7c2e941a312cc7193c7b29c9aea9106dd3811b45
