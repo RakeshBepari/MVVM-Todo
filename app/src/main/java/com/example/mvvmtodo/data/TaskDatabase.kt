@@ -14,16 +14,17 @@ abstract class TaskDatabase : RoomDatabase() {
 
     abstract fun getTaskDao(): TaskDao
 
+    //Dagger will not instantiated the taskDatabase when the callback is created
     class Callback @Inject constructor(
-        private val taskDatabase: Provider<TaskDatabase>,
+        private val taskDatabase: Provider<TaskDatabase> ,// With Provider we can get dependencies lazily and the circular dependency is borken
         @ApplicationScope private val applicationScope: CoroutineScope
-        ) :
-        RoomDatabase.Callback() {
+        ) : RoomDatabase.Callback() {
 
+        // onCreate is not executed when we construct the the TaskDatabase in AppModule (TaskDatabase needs callback as its dependency to be constructed)
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)
 
-            val dao = taskDatabase.get().getTaskDao()
+            val dao = taskDatabase.get().getTaskDao() // TaskDatabase is instantiated when we call get on it
 
             applicationScope.launch {
                 dao.insert(Task("Add Todos by clicking on the add button", important = true))

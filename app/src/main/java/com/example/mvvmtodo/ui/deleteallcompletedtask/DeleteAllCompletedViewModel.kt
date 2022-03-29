@@ -16,7 +16,7 @@ class DeleteAllCompletedViewModel @ViewModelInject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope
 ) :ViewModel()  {
 
-    fun onConfirmClick() = viewModelScope.launch {
+    fun onConfirmClick() = applicationScope.launch {
         Log.d(TAG,"Delete All completed Task Called")
         taskDao.deleteAllCompletedTask()
     }

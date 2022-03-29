@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.mvvmtodo.R
 import com.example.mvvmtodo.databinding.FragmentAddEditTaskBinding
+import com.example.mvvmtodo.uitl.exhaustive
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -30,7 +31,7 @@ class AddEditTaskFragment: Fragment(R.layout.fragment_add_edit_task) {
         binding.apply {
             editTextTaskName.setText(viewModel.taskName)
             checkBoxImportant.isChecked = viewModel.taskImportance
-            checkBoxImportant.jumpDrawablesToCurrentState()
+            checkBoxImportant.jumpDrawablesToCurrentState() // used to skip the animation and jump directly to the state
             textViewDateCreated.isVisible = viewModel.task!= null
             textViewDateCreated.text = "Created ${viewModel.task?.createdDateFormatted}"
 
@@ -51,7 +52,7 @@ class AddEditTaskFragment: Fragment(R.layout.fragment_add_edit_task) {
             viewModel.addEditTaskEvent.collect { event->
                 when(event){
                     is AddEditTaskViewModel.AddEditTaskEvent.NavigateBackWithResult -> {
-                        binding.editTextTaskName.clearFocus()
+                        binding.editTextTaskName.clearFocus() // This will hide the keyboard
                         setFragmentResult(
                             "add_edit_request",
                             bundleOf("add_edit_request" to event.result)
@@ -61,7 +62,7 @@ class AddEditTaskFragment: Fragment(R.layout.fragment_add_edit_task) {
                     is AddEditTaskViewModel.AddEditTaskEvent.ShowInvalidInputMessage -> {
                         Snackbar.make(requireView(),event.msg,Snackbar.LENGTH_LONG).show()
                     }
-                }
+                }.exhaustive
 
             }
         }

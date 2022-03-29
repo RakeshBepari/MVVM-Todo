@@ -7,5 +7,7 @@ i
 build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
 @
 app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
-n
->app/src/main/java/com/example/mvvmtodo/ui/tasks/TaskAdapter.kt,7\c\7c2e941a312cc7193c7b29c9aea9106dd3811b45
+Ž
+^app/src/main/java/com/example/mvvmtodo/ui/deleteallcompletedtask/DeleteAllCompletedFragment.kt,7\e\7e79667210b791b0646fabebee6c9ac8b051f39a
+c
+3app/src/main/java/com/example/mvvmtodo/data/Task.kt,8\a\8a68a28870374be0b5dc00301db93c0e33f19646

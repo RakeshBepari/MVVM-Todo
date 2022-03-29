@@ -5,8 +5,8 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mvvmtodo.ADD_TASK_RESULT_OK
-import com.example.mvvmtodo.EDIT_TASK_RESULT_OK
+import com.example.mvvmtodo.ui.ADD_TASK_RESULT_OK
+import com.example.mvvmtodo.ui.EDIT_TASK_RESULT_OK
 import com.example.mvvmtodo.data.Task
 import com.example.mvvmtodo.data.TaskDao
 import kotlinx.coroutines.channels.Channel
@@ -16,7 +16,17 @@ import kotlinx.coroutines.launch
 class AddEditTaskViewModel @ViewModelInject constructor(
     private val taskDao: TaskDao,
     @Assisted private val state: SavedStateHandle
+
+    /* SavedStateHandle is a handle to SavedInstanceState in Fragment which is used to
+     store and retrieve data in case of process death, and it also contains navigation
+     arguments which we sent over to the fragment of this viewModel because we inject
+     this viewModel to AddEditTask fragment. The dagger can automatically inject the
+     SavedStateHandle it just needs a special annotation @Assisted  */
+
 ): ViewModel() {
+
+    //The SavedStateHandle contains the navigation arguments by default
+    
     val task = state.get<Task>("task")
 
     private val addEditTaskEventChannel = Channel<AddEditTaskEvent>()

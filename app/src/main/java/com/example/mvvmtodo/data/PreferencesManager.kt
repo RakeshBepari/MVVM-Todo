@@ -35,7 +35,7 @@ class PreferencesManager @Inject constructor(@ApplicationContext context: Contex
                 throw exception
         }
         .map { preferences ->
-            val sortOrder = SortOrder.valueOf(
+            val sortOrder = SortOrder.valueOf(  // value of converts strings into enums. In this case enums of type sortOrder
                 preferences[PreferencesKeys.sortOrderPreference] ?: SortOrder.BY_DATE.name
             )
 

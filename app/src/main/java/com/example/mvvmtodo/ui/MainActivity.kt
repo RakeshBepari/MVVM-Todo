@@ -1,13 +1,13 @@
-package com.example.mvvmtodo
+package com.example.mvvmtodo.ui
 
 import android.app.Activity
-import android.app.Instrumentation
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.example.mvvmtodo.R
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,5 +31,8 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-const val ADD_TASK_RESULT_OK = Activity.RESULT_FIRST_USER
+const val ADD_TASK_RESULT_OK = Activity.RESULT_FIRST_USER // RESULT_FIRST_USER is the value that we are free to use ourselves
+                                                          // to avoid clashing with the system values
+                                                         // We are not using RESULT_OK or RESULT_CANCELED but still its a good
+                                                        // convention to avoid clashes between them
 const val EDIT_TASK_RESULT_OK = Activity.RESULT_FIRST_USER + 1

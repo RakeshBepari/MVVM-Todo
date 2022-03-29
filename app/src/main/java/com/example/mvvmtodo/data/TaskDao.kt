@@ -13,6 +13,7 @@ interface TaskDao {
     @Query("SELECT * FROM task_table WHERE (completed != :hideCompleted or completed = 0) and name LIKE '%' || :searchQuery || '%' ORDER BY important desc, created")
     fun getTasksSortedByDate(searchQuery: String, hideCompleted:Boolean): Flow<List<Task>>
 
+    // Flow can only be used or collected inside a coroutine that's why we don't use suspend modifier
     @Query("SELECT * FROM task_table WHERE name LIKE '%' || :searchQuery || '%' ORDER BY important desc")
     fun getTasks(searchQuery: String, sortOrder: SortOrder, hideCompleted:Boolean): Flow<List<Task>> =
         when(sortOrder){
@@ -21,7 +22,7 @@ interface TaskDao {
         }
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(task: Task)
+    suspend fun insert(task: Task) // suspend is a coroutine feature through which we can do io operation on a background thread
 
     @Update
     suspend fun update(task: Task)

@@ -19,6 +19,7 @@ import com.example.mvvmtodo.data.SortOrder
 import com.example.mvvmtodo.data.Task
 import com.example.mvvmtodo.databinding.FragmentTasksBinding
 import com.example.mvvmtodo.uitl.OnQueryTextChanged
+import com.example.mvvmtodo.uitl.exhaustive
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -49,10 +50,6 @@ class TasksFragment : Fragment(R.layout.fragment_tasks),TaskAdapter.OnItemClickL
                 viewModel.onAddTaskClicked()
             }
 
-            viewModel.tasks.observe(viewLifecycleOwner) {
-                taskAdapter.submitList(it)
-            }
-
             ItemTouchHelper(object :
                 ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
                 override fun onMove(
@@ -77,20 +74,35 @@ class TasksFragment : Fragment(R.layout.fragment_tasks),TaskAdapter.OnItemClickL
 
         }
 
+        /*
+         we use viewLifecycleOwner because when we go to a different fragment this fragment is put to background
+         the fragment instance stays alive but the view hierarchy is destroyed and when we don't have a view
+         means we don't have a recycler view to show the data and if we don't have a recycler view we don't need
+         updates, and if we get updates while the view hierarchy is no there we would get crashes because the references
+         would not be valid
+         */
+        viewModel.tasks.observe(viewLifecycleOwner) {
+            taskAdapter.submitList(it)
+        }
+
+        // we use launchWhenStarted cause to make the scope of the coroutine smaller it will be cancelled when onStop is called
+        // instead of when onDestroy is called and restarted when onStart is called
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.taskEvents.collect { event->
                 when(event){
                     is TasksViewModel.TaskEvents.ShowUndoDeleteTaskMessage ->{
                         Snackbar.make(requireView(),"Task Deleted", Snackbar.LENGTH_LONG)
                             .setAction("Undo"){
-                                viewModel.onUndoDeleteClicked(event.task)
+                                viewModel.onUndoDeleteClicked(event.task) // we can write event.task directly cause we are in the
+                                                                          // when check of TasksViewModel.TaskEvents.ShowUndoDeleteTaskMessage
+                                                                         // which automatically smart cast to ShowUndoDeleteTaskMessage event
                             }.show()
                     }
-                    is TasksViewModel.TaskEvents.NavigateToAddTask -> {
+                    is TasksViewModel.TaskEvents.NavigateToAddTaskScreen -> {
                         val action = TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(null,"New Task")
                         findNavController().navigate(action)
                     }
-                    is TasksViewModel.TaskEvents.NavigateToEditTask -> {
+                    is TasksViewModel.TaskEvents.NavigateToEditTaskScreen -> {
                         val action = TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(event.task,"Edit Task")
                         findNavController().navigate(action)
                     }
@@ -101,7 +113,7 @@ class TasksFragment : Fragment(R.layout.fragment_tasks),TaskAdapter.OnItemClickL
                         val action = TasksFragmentDirections.actionGlobalDeleteAllCompletedDialogFragment()
                         findNavController().navigate(action)
                     }
-                }
+                }.exhaustive
 
             }
         }
@@ -130,9 +142,15 @@ class TasksFragment : Fragment(R.layout.fragment_tasks),TaskAdapter.OnItemClickL
             viewModel.searchQuery.value = it
         }
 
+        // viewLifecycleOwner lives as long as the view lives. If the view is destroyed the coroutine will be cancelled and
+        // we won't read any more values from the flow.
         viewLifecycleOwner.lifecycleScope.launch {
             menu.findItem(R.id.action_hide_completed_tasks).isChecked =
-                viewModel.preferencesFlow.first().hideCompleted
+                viewModel.preferencesFlow.first().hideCompleted // .first() is used as we only want to read from the flow only once
+                                                                // after we started our app. This will read the value from the flow
+                                                                // once and then cancel it. But cancelling the flow doesn't mean that
+                                                                // it stops working in other places, it will just be cancelled inside
+                                                                // this coroutine
         }
 
     }
@@ -171,6 +189,9 @@ class TasksFragment : Fragment(R.layout.fragment_tasks),TaskAdapter.OnItemClickL
     override fun onDestroyView() {
         super.onDestroyView()
         searchView.setOnQueryTextListener(null)
+    /* when a fragment's view is destroyed the searchView by default sends an empty
+     string as the input which makes the searchQuery value in the vm empty so
+     we make searchView a property of this class so we can deactivate the listener of  searchView */
     }
 
 }

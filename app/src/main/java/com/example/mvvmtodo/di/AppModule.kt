@@ -27,15 +27,15 @@ object AppModule {
         .addCallback(callback)
         .build()
 
-
+// TaskDao is singleton automatically that how room works under the hood that why we don't need to annotate it with @Singleton
     @Provides
-    @Singleton
     fun providesTaskDao(taskDatabase: TaskDatabase) = taskDatabase.getTaskDao()
 
     @ApplicationScope
     @Provides
     @Singleton
-    fun provideApplicationScope() = CoroutineScope(SupervisorJob())
+    fun provideApplicationScope() = CoroutineScope(SupervisorJob()) // this coroutine scope lives as long as the application does
+    //                                                                 because we defined it as singleton in the ApplicationComponent class
 }
 
 @Retention(AnnotationRetention.RUNTIME)
